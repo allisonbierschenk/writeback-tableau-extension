@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Manifest>
-  <Name>Writeback Extension</Name>
-  <Description>Sample write-back extension for Tableau</Description>
-  <Author>
-    <Name>Your Name</Name>
-    <Email>abierschenk@salesforce.com</Email>
-  </Author>
-  <Url>http://localhost:65271</Url>
-  <Icon>icon.png</Icon>
-  <Version>1.0.0</Version>
-  <MinApiVersion>1.0</MinApiVersion>
-</Manifest>
+<manifest manifest-version="0.1" xmlns="http://www.tableau.com/xml/extension_manifest">
+  <dashboard-extension id="com.abierschenk.writeback" extension-version="0.1.0">
+    <default-locale>en_US</default-locale>
+    <name>Writeback Extension</name>
+    <description>Sample write-back extension for Tableau</description>
+    <author 
+      name="Allison Bierschenk" 
+      email="abierschenk@salesforce.com" 
+      organization="Salesforce" 
+      website="http://localhost:65271"/>
+    <min-api-version>1.0</min-api-version>
+    <source-location>
+      <url>http://localhost:65271</url>
+    </source-location>
+  </dashboard-extension>
+</manifest>
