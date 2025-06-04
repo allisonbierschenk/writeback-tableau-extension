@@ -4,10 +4,11 @@ const { Pool } = require('pg');
 const pool = new Pool({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  host: process.env.DB_SERVER,
-  port: parseInt(process.env.DB_PORT, 10),
+  host: "localhost",
+  port: 5432,
   database: "postgres"
 });
+
 
 // Test connection function
 async function testConnection() {
