@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Manifest>
+  <Name>Writeback Extension</Name>
+  <Description>Sample write-back extension for Tableau</Description>
+  <Author>
+    <Name>Your Name</Name>
+    <Email>abierschenk@salesforce.com</Email>
+  </Author>
+  <Url>http://localhost:65271</Url>
+  <Icon>icon.png</Icon>
+  <Version>1.0.0</Version>
+  <MinApiVersion>1.0</MinApiVersion>
+</Manifest>
