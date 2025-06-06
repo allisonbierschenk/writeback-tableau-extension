@@ -1,16 +1,17 @@
+require('dotenv').config();
 const { Pool } = require('pg');
 
-// Use environment variables for all config values
+
 const pool = new Pool({
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  host: process.env.DB_SERVER,
-  port: 5432,
-  database: "postgres"
+  connectionString: process.env.DB_SERVER,
+  ssl: {
+    rejectUnauthorized: false // CHANGE THIS BACK TO THIS CONFIGURATION
+  }
 });
 
 // Test connection function
 async function testConnection() {
+  console.log("test connection is", process.env.DB_SERVER)
   try {
     const client = await pool.connect();
     const result = await client.query('SELECT 1 AS test');

@@ -1,6 +1,8 @@
+require('dotenv').config();
 const express = require("express");
 const app = express();
 const sql = require("./database");
+const PORT = process.env.PORT || 3000; // Use process.env.PORT for deployment, fallback to 3000
 
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
@@ -23,6 +25,6 @@ app.post("/update/:requestID", async function(request, response) {
   response.send(update);
 });
 
-const listener = app.listen(process.env.PORT, function() {
+const listener = app.listen(PORT, function() {
   console.log("Your app is listening on port " + listener.address().port);
 });
