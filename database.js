@@ -21,35 +21,17 @@ const pool = new Pool(poolConfig);
 // Test connection function
 async function testConnection() {
   const connStr = process.env.DB_SERVER || '';
-  // Mask password in logs
-  const maskedStr = connStr ? connStr.replace(/:[^:@]+@/, ':****@') : 'not set';
-  console.log("Testing database connection...");
-  console.log("Connection string:", maskedStr);
   
   if (!connStr) {
-    console.error("ERROR: DB_SERVER environment variable is not set!");
     return;
-  }
-  
-  if (connStr.includes('localhost') || connStr.includes('127.0.0.1')) {
-    console.warn("WARNING: Connection string uses localhost. If running in a container (Railway/Docker),");
-    console.warn("localhost will not work - you need to use a cloud database or tunnel service.");
   }
   
   try {
     const client = await pool.connect();
-    const result = await client.query('SELECT 1 AS test');
-    console.log("✓ Database connection successful!");
+    await client.query('SELECT 1 AS test');
     client.release();
   } catch (err) {
-    console.error("✗ Database connection failed!");
-    console.error("Error:", err.message);
-    if (err.code === 'ECONNREFUSED') {
-      console.error("\nTROUBLESHOOTING:");
-      console.error("- If running in Railway/Docker: localhost won't work. Use a cloud database.");
-      console.error("- Check that PostgreSQL is running and accessible.");
-      console.error("- Verify the connection string is correct.");
-    }
+    // Silent fail
   }
 }
 
@@ -61,10 +43,9 @@ module.exports.getTechnicians = async () => {
   const query = `SELECT * FROM "technicians"`;
   try {
     const result = await pool.query(query);
-    console.log("results", result.rows)
     return result.rows;
   } catch (err) {
-    console.log(err);
+    throw err;
   }
 };
 
@@ -81,9 +62,12 @@ module.exports.getRequest = async requestID => {
 
   try {
     const result = await pool.query(query, [requestID]);
+    if (result.rows.length === 0) {
+      return null;
+    }
     return result.rows[0];
   } catch (err) {
-    console.log(err);
+    throw err;
   }
 };
 
@@ -106,7 +90,6 @@ module.exports.updateRequest = async (requestID, data) => {
     // If one row was updated, return true
     return result.rowCount === 1;
   } catch (err) {
-    console.error("Error in updateRequest:", err);
-    throw err; // Re-throw so the route can handle it
+    throw err;
   }
 };

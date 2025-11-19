@@ -48,7 +48,6 @@ app.post("/update/:requestID", async function(request, response) {
     // Send the result as a string "true" or "false" so it can be properly passed through the dialog
     response.send(update === true ? "true" : "false");
   } catch (err) {
-    console.error("Error updating request:", err);
     response.status(500).send("false");
   }
 });
