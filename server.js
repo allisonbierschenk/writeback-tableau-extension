@@ -43,8 +43,14 @@ app.get("/request/:requestID", async function(request, response) {
 });
 
 app.post("/update/:requestID", async function(request, response) {
-  let update = await sql.updateRequest(request.params.requestID, request.body);
-  response.send(update);
+  try {
+    let update = await sql.updateRequest(request.params.requestID, request.body);
+    // Send the result as a string "true" or "false" so it can be properly passed through the dialog
+    response.send(update === true ? "true" : "false");
+  } catch (err) {
+    console.error("Error updating request:", err);
+    response.status(500).send("false");
+  }
 });
 
 const listener = app.listen(PORT, function() {

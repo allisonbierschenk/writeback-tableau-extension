@@ -106,6 +106,7 @@ module.exports.updateRequest = async (requestID, data) => {
     // If one row was updated, return true
     return result.rowCount === 1;
   } catch (err) {
-    console.log(err);
+    console.error("Error in updateRequest:", err);
+    throw err; // Re-throw so the route can handle it
   }
 };
