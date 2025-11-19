@@ -7,7 +7,7 @@
       <author name="Allison Bierschenk" email="abierschenk@salesforce.com" organization="Salesforce" website="https://www.salesforce.com/"/>
       <min-api-version>1.0</min-api-version>
       <source-location>
-      <url>http://localhost:4000</url>
+      <url>https://writeback-tableau-extension-production.up.railway.app</url>
       </source-location>
       <icon></icon>
       <permissions>
