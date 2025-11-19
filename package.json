@@ -13,7 +13,7 @@
     "pg": "^8.16.0"
   },
   "engines": {
-    "node": "10.x"
+    "node": "18.x"
   },
   "repository": {
     "url": "https://glitch.com/edit/#!/hello-express"
