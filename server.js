@@ -4,6 +4,22 @@ const app = express();
 const sql = require("./database");
 const PORT = process.env.PORT || 3000; // Use process.env.PORT for deployment, fallback to 3000
 
+// CORS and security headers for Tableau extensions
+app.use((req, res, next) => {
+  // Allow Tableau to load the extension from any origin
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
+
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
