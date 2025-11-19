@@ -20,14 +20,36 @@ const pool = new Pool(poolConfig);
 
 // Test connection function
 async function testConnection() {
-  console.log("test connection is", process.env.DB_SERVER)
+  const connStr = process.env.DB_SERVER || '';
+  // Mask password in logs
+  const maskedStr = connStr ? connStr.replace(/:[^:@]+@/, ':****@') : 'not set';
+  console.log("Testing database connection...");
+  console.log("Connection string:", maskedStr);
+  
+  if (!connStr) {
+    console.error("ERROR: DB_SERVER environment variable is not set!");
+    return;
+  }
+  
+  if (connStr.includes('localhost') || connStr.includes('127.0.0.1')) {
+    console.warn("WARNING: Connection string uses localhost. If running in a container (Railway/Docker),");
+    console.warn("localhost will not work - you need to use a cloud database or tunnel service.");
+  }
+  
   try {
     const client = await pool.connect();
     const result = await client.query('SELECT 1 AS test');
-    console.log("Connection successful! Test query result:", result.rows);
+    console.log("✓ Database connection successful!");
     client.release();
   } catch (err) {
-    console.error("Connection failed:", err);
+    console.error("✗ Database connection failed!");
+    console.error("Error:", err.message);
+    if (err.code === 'ECONNREFUSED') {
+      console.error("\nTROUBLESHOOTING:");
+      console.error("- If running in Railway/Docker: localhost won't work. Use a cloud database.");
+      console.error("- Check that PostgreSQL is running and accessible.");
+      console.error("- Verify the connection string is correct.");
+    }
   }
 }
 
