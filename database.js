@@ -1,13 +1,22 @@
 require('dotenv').config();
 const { Pool } = require('pg');
 
+// Configure for local database (no SSL needed)
+const connectionString = process.env.DB_SERVER;
 
-const pool = new Pool({
-  connectionString: process.env.DB_SERVER,
-  ssl: {
-    rejectUnauthorized: false // CHANGE THIS BACK TO THIS CONFIGURATION
-  }
-});
+const poolConfig = {
+  connectionString: connectionString
+};
+
+// Only use SSL if connection string explicitly requires it (for remote databases)
+// Local databases typically don't need SSL
+if (connectionString && (connectionString.includes('ssl=true') || connectionString.includes('render.com'))) {
+  poolConfig.ssl = {
+    rejectUnauthorized: false
+  };
+}
+
+const pool = new Pool(poolConfig);
 
 // Test connection function
 async function testConnection() {
