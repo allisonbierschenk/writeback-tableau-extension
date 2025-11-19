@@ -11,7 +11,13 @@ app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  
+  // Tableau extensions need to be in an iframe - don't block with X-Frame-Options
+  // Or use ALLOWALL for Tableau extensions
+  res.removeHeader('X-Frame-Options');
+  
+  // Content Security Policy for Tableau extensions
+  res.setHeader('Content-Security-Policy', "frame-ancestors *;");
   
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
