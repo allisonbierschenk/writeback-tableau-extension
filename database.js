@@ -8,9 +8,9 @@ const poolConfig = {
   connectionString: connectionString
 };
 
-// Only use SSL if connection string explicitly requires it (for remote databases)
-// Local databases typically don't need SSL
-if (connectionString && (connectionString.includes('ssl=true') || connectionString.includes('render.com'))) {
+// Enable SSL for any remote/managed Postgres (Render, Railway, etc.).
+// Local connections (localhost / 127.0.0.1) skip SSL.
+if (connectionString && !/localhost|127\.0\.0\.1/.test(connectionString)) {
   poolConfig.ssl = {
     rejectUnauthorized: false
   };
