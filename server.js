@@ -55,8 +55,23 @@ app.post("/update/:requestID", async function(request, response) {
 
 app.get("/bulk", async function(request, response) {
   const ids = (request.query.ids || "").split(",").filter(Boolean);
-  const techs = await sql.getTechnicians();
-  response.render("bulk", { ids, techs });
+  const [techs, rows] = await Promise.all([
+    sql.getTechnicians(),
+    sql.getRequestsBulk(ids)
+  ]);
+
+  const uniq = key => {
+    const values = [...new Set(rows.map(r => r[key]))];
+    return values.length === 1 ? values[0] : null; // null = mixed
+  };
+
+  const current = {
+    technician_id: uniq("technician_id"),
+    status: uniq("status"),
+    technician_comments: uniq("technician_comments")
+  };
+
+  response.render("bulk", { ids, techs, current });
 });
 
 app.post("/update-bulk", async function(request, response) {

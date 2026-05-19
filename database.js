@@ -94,6 +94,22 @@ module.exports.updateRequest = async (requestID, data) => {
   }
 };
 
+// Get current values for a set of request IDs (used to pre-fill the bulk dialog).
+module.exports.getRequestsBulk = async requestIDs => {
+  const ids = requestIDs.map(id => parseInt(id, 10)).filter(Number.isFinite);
+  if (ids.length === 0) return [];
+
+  const placeholders = ids.map((_, i) => `$${i + 1}`).join(", ");
+  const query = `
+    SELECT request_id, technician_id, status, technician_comments
+    FROM requests
+    WHERE request_id IN (${placeholders})
+  `;
+
+  const result = await pool.query(query, ids);
+  return result.rows;
+};
+
 // Bulk-update requests. `fields` is an object that may contain any of:
 //   tech, status, comments. Only provided keys are written.
 module.exports.updateRequestsBulk = async (requestIDs, fields) => {

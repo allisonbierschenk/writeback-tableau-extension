@@ -20,26 +20,36 @@
 
       <input type="hidden" id="ids" value="<%= ids.join(',') %>">
 
+      <%
+        const techMixed = current.technician_id === null;
+        const statusMixed = current.status === null;
+        const commentsMixed = current.technician_comments === null;
+      %>
+
       <div class="form-group">
         <div class="form-check mb-1">
           <input class="form-check-input apply-toggle" type="checkbox" id="applyTech" data-target="tech">
-          <label class="form-check-label" for="applyTech"><b>Assigned to</b></label>
+          <label class="form-check-label" for="applyTech"><b>Assigned to</b><% if (techMixed) { %> <span class="text-muted" style="font-weight: normal;">(mixed)</span><% } %></label>
         </div>
         <select class="form-control" id="tech" disabled>
-          <option value="">--Not assigned--</option>
-          <%- techs.map(tech =>
-            `<option value="${tech.technician_id}">${tech.technician_name}</option>`).join("") %>
+          <% if (techMixed) { %><option value="" selected>-- Mixed --</option><% } %>
+          <option value="" <%= !techMixed && current.technician_id == null ? 'selected' : '' %>>--Not assigned--</option>
+          <%- techs.map(tech => {
+            const sel = !techMixed && String(current.technician_id) === String(tech.technician_id) ? 'selected' : '';
+            return `<option value="${tech.technician_id}" ${sel}>${tech.technician_name}</option>`;
+          }).join("") %>
         </select>
       </div>
 
       <div class="form-group">
         <div class="form-check mb-1">
           <input class="form-check-input apply-toggle" type="checkbox" id="applyStatus" data-target="status">
-          <label class="form-check-label" for="applyStatus"><b>Status</b></label>
+          <label class="form-check-label" for="applyStatus"><b>Status</b><% if (statusMixed) { %> <span class="text-muted" style="font-weight: normal;">(mixed)</span><% } %></label>
         </div>
         <select class="form-control" id="status" disabled>
+          <% if (statusMixed) { %><option value="" selected>-- Mixed --</option><% } %>
           <% ["Requested", "In Progress", "Closed"].forEach(status => { %>
-            <%- `<option value="${status}">${status}</option>` %>
+            <%- `<option value="${status}" ${!statusMixed && current.status === status ? 'selected' : ''}>${status}</option>` %>
           <% }) %>
         </select>
       </div>
@@ -47,9 +57,9 @@
       <div class="form-group">
         <div class="form-check mb-1">
           <input class="form-check-input apply-toggle" type="checkbox" id="applyComments" data-target="comments">
-          <label class="form-check-label" for="applyComments"><b>Comments</b></label>
+          <label class="form-check-label" for="applyComments"><b>Comments</b><% if (commentsMixed) { %> <span class="text-muted" style="font-weight: normal;">(mixed)</span><% } %></label>
         </div>
-        <textarea class="form-control" id="comments" rows="3" disabled></textarea>
+        <textarea class="form-control" id="comments" rows="3" placeholder="<%= commentsMixed ? '-- Mixed --' : '' %>" disabled><%= commentsMixed ? '' : (current.technician_comments || '') %></textarea>
       </div>
 
       <div class="row justify-content-end">
