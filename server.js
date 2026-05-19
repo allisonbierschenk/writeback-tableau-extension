@@ -28,6 +28,7 @@ app.use((req, res, next) => {
 
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.set("view engine", "ejs");
 
 app.get("/", function(request, response) {
@@ -47,6 +48,27 @@ app.post("/update/:requestID", async function(request, response) {
     let update = await sql.updateRequest(request.params.requestID, request.body);
     // Send the result as a string "true" or "false" so it can be properly passed through the dialog
     response.send(update === true ? "true" : "false");
+  } catch (err) {
+    response.status(500).send("false");
+  }
+});
+
+app.get("/bulk", async function(request, response) {
+  const ids = (request.query.ids || "").split(",").filter(Boolean);
+  const techs = await sql.getTechnicians();
+  response.render("bulk", { ids, techs });
+});
+
+app.post("/update-bulk", async function(request, response) {
+  try {
+    const ids = (request.body.ids || "").split(",").filter(Boolean);
+    const fields = {};
+    if (request.body.applyTech === "1") fields.tech = request.body.tech;
+    if (request.body.applyStatus === "1") fields.status = request.body.status;
+    if (request.body.applyComments === "1") fields.comments = request.body.comments;
+
+    const updated = await sql.updateRequestsBulk(ids, fields);
+    response.send(updated > 0 ? "true" : "false");
   } catch (err) {
     response.status(500).send("false");
   }

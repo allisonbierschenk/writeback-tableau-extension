@@ -93,3 +93,38 @@ module.exports.updateRequest = async (requestID, data) => {
     throw err;
   }
 };
+
+// Bulk-update requests. `fields` is an object that may contain any of:
+//   tech, status, comments. Only provided keys are written.
+module.exports.updateRequestsBulk = async (requestIDs, fields) => {
+  const ids = requestIDs.map(id => parseInt(id, 10)).filter(Number.isFinite);
+  if (ids.length === 0) return 0;
+
+  const sets = [];
+  const params = [];
+  if (Object.prototype.hasOwnProperty.call(fields, "tech")) {
+    params.push(fields.tech === "" ? null : fields.tech);
+    sets.push(`technician_id = $${params.length}`);
+  }
+  if (Object.prototype.hasOwnProperty.call(fields, "status")) {
+    params.push(fields.status);
+    sets.push(`status = $${params.length}`);
+  }
+  if (Object.prototype.hasOwnProperty.call(fields, "comments")) {
+    params.push(fields.comments);
+    sets.push(`technician_comments = $${params.length}`);
+  }
+  if (sets.length === 0) return 0;
+
+  const idPlaceholders = ids.map((_, i) => `$${params.length + i + 1}`).join(", ");
+  params.push(...ids);
+
+  const query = `
+    UPDATE requests
+    SET ${sets.join(", ")}
+    WHERE request_id IN (${idPlaceholders})
+  `;
+
+  const result = await pool.query(query, params);
+  return result.rowCount;
+};

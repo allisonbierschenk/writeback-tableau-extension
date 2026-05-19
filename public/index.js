@@ -11,30 +11,27 @@ tableau.extensions.initializeAsync().then(() => {
 });
 
 const edit = async event => {
-  let data = await event.getMarksAsync();
-  data = data.data[0];
+  let marks = await event.getMarksAsync();
+  const table = marks.data[0];
+  if (!table || table.data.length === 0) return;
 
-  const index = data.columns.find(col => col.fieldName === "Request Id").index;
-  const requestid = data.data[0][index].value;
+  const idIndex = table.columns.find(col => col.fieldName === "Request Id").index;
+  const ids = [...new Set(table.data.map(row => row[idIndex].value))];
 
-  const url = `${window.location.origin}/request/${requestid}`;
+  const url = ids.length === 1
+    ? `${window.location.origin}/request/${ids[0]}`
+    : `${window.location.origin}/bulk?ids=${ids.join(",")}`;
 
-  let closePayload = await tableau.extensions.ui.displayDialogAsync(url, null, {width: 600, height: 450});
-  
-  // Refresh the dashboard if update was successful
+  const dialogSize = ids.length === 1 ? {width: 600, height: 450} : {width: 600, height: 500};
+  const closePayload = await tableau.extensions.ui.displayDialogAsync(url, null, dialogSize);
+
   if (closePayload === true || closePayload === "true") {
     try {
-      const worksheet = event.worksheet;
-      const dataSources = await worksheet.getDataSourcesAsync();
-      
-      // Refresh all data sources
-      for (let dataSource of dataSources) {
+      const dataSources = await event.worksheet.getDataSourcesAsync();
+      for (const dataSource of dataSources) {
         await dataSource.refreshAsync();
       }
-      
-      // Refresh the dashboard to update all worksheets
-      const dashboard = tableau.extensions.dashboardContent.dashboard;
-      await dashboard.refreshAsync();
+      await tableau.extensions.dashboardContent.dashboard.refreshAsync();
     } catch (err) {
       // Silent fail - just don't refresh
     }
